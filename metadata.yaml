@@ -4,5 +4,5 @@ desc: 通过 Codex Transport 或官方 Codex App Server，在 AstrBot 中使用 
 description: 通过 Codex Transport 或官方 Codex App Server，在 AstrBot 中使用 ChatGPT 账号可用的 Codex 模型。
 author: Longzhooou
 version: 1.0.4
-repo: https://github.com/longzhou23/astrbot_plugin_chatgpt_codex
+repo: https://github.com/xiaoliz1/astrbot_plugin_chatgpt_codex
 astrbot_version: ">=4.13.0"

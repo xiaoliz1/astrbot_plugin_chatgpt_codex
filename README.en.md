@@ -7,10 +7,10 @@ Built on the official Codex sign-in flow, with a lightweight Responses transport
 
 [简体中文](README.md)
 
-[![Version](https://img.shields.io/badge/version-v1.0.4-blue)](https://github.com/longzhou23/astrbot_plugin_chatgpt_codex/releases)
+[![Version](https://img.shields.io/badge/version-v1.0.4-blue)](https://github.com/xiaoliz1/astrbot_plugin_chatgpt_codex)
 [![AstrBot](https://img.shields.io/badge/AstrBot-%3E%3D%204.13.0-blue)](https://github.com/AstrBotDevs/AstrBot)
 [![Codex](https://img.shields.io/badge/backend-OpenAI%20Codex-black)](https://github.com/openai/codex)
-[![Status](https://img.shields.io/badge/status-Stable-brightgreen)](https://github.com/longzhou23/astrbot_plugin_chatgpt_codex)
+[![Status](https://img.shields.io/badge/status-Stable-brightgreen)](https://github.com/xiaoliz1/astrbot_plugin_chatgpt_codex)
 
 </div>
 
@@ -146,8 +146,8 @@ If the AstrBot service account cannot resolve `codex`, set `codex_path` in the p
 ### 2. Install the plugin
 
 ```bash
-git clone --branch v1.0.4 --depth 1 \
-  https://github.com/longzhou23/astrbot_plugin_chatgpt_codex.git
+git clone --depth 1 \
+  https://github.com/xiaoliz1/astrbot_plugin_chatgpt_codex.git
 ```
 
 Place the directory at:
@@ -650,7 +650,7 @@ Keep in mind:
 
 ## 🐛 Feedback
 
-Repository: <https://github.com/longzhou23/astrbot_plugin_chatgpt_codex>
+Repository: <https://github.com/xiaoliz1/astrbot_plugin_chatgpt_codex>
 
 When opening an Issue, please include:
 
