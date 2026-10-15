@@ -9,6 +9,7 @@ from ..agent_provider import (
     _is_title_generation_request,
     _normalize_request_inputs,
     _normalize_request_options,
+    _resolve_session_id,
     _stream_frames,
     _stream_provider_responses,
     _validated_tool_choice,
@@ -23,6 +24,22 @@ async def event_stream(events):
 
 
 class AgentProviderContractTests(unittest.IsolatedAsyncioTestCase):
+    def test_conversation_id_is_accepted_as_session_id(self):
+        kwargs = {"conversation_id": "  group:123:user:456  ", "temperature": 0.2}
+
+        session_id = _resolve_session_id(None, kwargs)
+
+        self.assertEqual(session_id, "group:123:user:456")
+        self.assertEqual(kwargs, {"temperature": 0.2})
+
+    def test_explicit_session_id_takes_precedence_over_conversation_id(self):
+        kwargs = {"conversation_id": "fallback-id"}
+
+        session_id = _resolve_session_id("session-id", kwargs)
+
+        self.assertEqual(session_id, "session-id")
+        self.assertEqual(kwargs, {})
+
     def test_server_usage_maps_to_astrbot_without_double_counting_reasoning(self):
         usage = _astrbot_token_usage(
             {

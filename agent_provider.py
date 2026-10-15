@@ -271,6 +271,22 @@ def _conversation_key(session_id: str | None) -> str:
     return key or f"__astrbot_ephemeral__:{uuid.uuid4().hex}"
 
 
+def _resolve_session_id(session_id: str | None, kwargs: dict[str, Any]) -> str | None:
+    """Accept AstrBot's conversation_id alias as the provider session id.
+
+    AstrBot versions and call sites may pass the conversation identifier via
+    ``session_id`` or ``conversation_id``. The latter is a routing identifier,
+    not a Responses API request option, so consume it before validating kwargs.
+    """
+
+    conversation_id = kwargs.pop("conversation_id", None)
+    if session_id is not None and session_id.strip():
+        return session_id
+    if isinstance(conversation_id, str) and conversation_id.strip():
+        return conversation_id.strip()
+    return session_id
+
+
 def _is_ephemeral_session(session_id: str | None) -> bool:
     return not bool((session_id or "").strip())
 
@@ -578,6 +594,7 @@ if _ASTRBOT_AVAILABLE:
             **kwargs: Any,
         ) -> LLMResponse:
             try:
+                session_id = _resolve_session_id(session_id, kwargs)
                 abort_signal = kwargs.pop("abort_signal", None)
                 request_options = _normalize_request_options(kwargs)
                 response_tools = openai_tools_to_responses(func_tool)
@@ -635,6 +652,7 @@ if _ASTRBOT_AVAILABLE:
             **kwargs: Any,
         ) -> AsyncGenerator[LLMResponse, None]:
             try:
+                session_id = _resolve_session_id(session_id, kwargs)
                 abort_signal = kwargs.pop("abort_signal", None)
                 request_options = _normalize_request_options(kwargs)
                 response_tools = openai_tools_to_responses(func_tool)

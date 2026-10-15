@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 兼容 AstrBot 传入的 `conversation_id`，将其作为会话标识处理，避免被误判为不支持的模型调用参数；优先保留显式传入的 `session_id`。
 - 将插件元数据和中英文 README 的安装地址统一到 `xiaoliz1` fork；安装命令改为克隆默认分支，避免引用 fork 中不存在的 `v1.0.4` 标签。
 - Codex 提供器在模型调用失败时，会在错误详情后附加“主人，赶紧给我充 token！”提醒。
 
