@@ -73,6 +73,15 @@ _SUPPORTED_REQUEST_OPTIONS = {
     "parallel_tool_calls",
     "stop",
 }
+_OWNER_TOKEN_REMINDER = "主人，赶紧给我充 token！"
+
+
+def _append_owner_token_reminder(error: Exception) -> None:
+    """Add the configured-in-code owner reminder to provider error details."""
+
+    message = str(error)
+    if _OWNER_TOKEN_REMINDER not in message:
+        error.args = (f"{message}\n{_OWNER_TOKEN_REMINDER}",)
 
 
 def bind_service(service: CodexService) -> None:
@@ -568,16 +577,22 @@ if _ASTRBOT_AVAILABLE:
             request_max_retries: int | None = None,
             **kwargs: Any,
         ) -> LLMResponse:
-            abort_signal = kwargs.pop("abort_signal", None)
-            request_options = _normalize_request_options(kwargs)
-            response_tools = openai_tools_to_responses(func_tool)
-            selected_tool_choice = _validated_tool_choice(tool_choice, response_tools)
-            if session_id is None and _is_title_generation_request(prompt, contexts, system_prompt):
-                return LLMResponse(role="assistant", completion_text="<None>")
+            try:
+                abort_signal = kwargs.pop("abort_signal", None)
+                request_options = _normalize_request_options(kwargs)
+                response_tools = openai_tools_to_responses(func_tool)
+                selected_tool_choice = _validated_tool_choice(tool_choice, response_tools)
+                if session_id is None and _is_title_generation_request(
+                    prompt, contexts, system_prompt
+                ):
+                    return LLMResponse(role="assistant", completion_text="<None>")
+            except Exception as exc:
+                _append_owner_token_reminder(exc)
+                raise
             session_key = _conversation_key(session_id)
             ephemeral = _is_ephemeral_session(session_id)
-            latest_prompt, historical_contexts = _normalize_request_inputs(prompt, contexts)
             try:
+                latest_prompt, historical_contexts = _normalize_request_inputs(prompt, contexts)
                 events = self._service().stream_turn(
                     session_key=session_key,
                     prompt=latest_prompt,
@@ -595,6 +610,9 @@ if _ASTRBOT_AVAILABLE:
                     request_options=request_options,
                 )
                 return await _collect_provider_response(events)
+            except Exception as exc:
+                _append_owner_token_reminder(exc)
+                raise
             finally:
                 if ephemeral:
                     with contextlib.suppress(Exception):
@@ -616,17 +634,23 @@ if _ASTRBOT_AVAILABLE:
             request_max_retries: int | None = None,
             **kwargs: Any,
         ) -> AsyncGenerator[LLMResponse, None]:
-            abort_signal = kwargs.pop("abort_signal", None)
-            request_options = _normalize_request_options(kwargs)
-            response_tools = openai_tools_to_responses(func_tool)
-            selected_tool_choice = _validated_tool_choice(tool_choice, response_tools)
-            if session_id is None and _is_title_generation_request(prompt, contexts, system_prompt):
-                yield LLMResponse(role="assistant", completion_text="<None>", is_chunk=False)
-                return
+            try:
+                abort_signal = kwargs.pop("abort_signal", None)
+                request_options = _normalize_request_options(kwargs)
+                response_tools = openai_tools_to_responses(func_tool)
+                selected_tool_choice = _validated_tool_choice(tool_choice, response_tools)
+                if session_id is None and _is_title_generation_request(
+                    prompt, contexts, system_prompt
+                ):
+                    yield LLMResponse(role="assistant", completion_text="<None>", is_chunk=False)
+                    return
+            except Exception as exc:
+                _append_owner_token_reminder(exc)
+                raise
             session_key = _conversation_key(session_id)
             ephemeral = _is_ephemeral_session(session_id)
-            latest_prompt, historical_contexts = _normalize_request_inputs(prompt, contexts)
             try:
+                latest_prompt, historical_contexts = _normalize_request_inputs(prompt, contexts)
                 events = self._service().stream_turn(
                     session_key=session_key,
                     prompt=latest_prompt,
@@ -648,6 +672,9 @@ if _ASTRBOT_AVAILABLE:
                     # transition the step to DONE. Tool calls are returned as structured
                     # fields so AstrBot, rather than Codex, executes the next loop step.
                     yield response
+            except Exception as exc:
+                _append_owner_token_reminder(exc)
+                raise
             finally:
                 if ephemeral:
                     with contextlib.suppress(Exception):
